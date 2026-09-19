@@ -1,0 +1,27 @@
+http_request_duration_seconds{n="1"} 1    
+http_request_duration_seconds{n="2"} 1.5
+http_request_duration_seconds{n="3"} 0.5
+http_request_duration_seconds{n="4"} 2
+http_request_duration_seconds{n="5"} 1
+http_request_duration_seconds{n="6"} 0.5
+http_request_duration_seconds{n="7"} 1
+http_request_duration_seconds{n="8"} 1.5
+http_request_duration_seconds{n="9"} 0.5
+http_request_duration_seconds{n="10"} 1
+
+------------------------------------------------------
+## Histogram for http_request_duration_seconds
+http_request_duration_seconds_bucket{le="0.5"} 3
+http_request_duration_seconds_bucket{le="1"} 7
+http_request_duration_seconds_bucket{le="1.5"} 9
+http_request_duration_seconds_bucket{le="2"} 10
+http_request_duration_seconds_bucket{le="+Inf"} 10
+
+histogram_quantile(0.5, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+-------------------------------------------------------
+## Summary for http_request_duration_seconds
+http_request_duration_seconds_sum 11.5
+http_request_duration_seconds_count 10
+http_request_duration_seconds{quantile="0.5"} 0.75
+http_request_duration_seconds{quantile="0.9"} 1.5
+http_request_duration_seconds{quantile="0.99"} 2

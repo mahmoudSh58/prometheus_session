@@ -1,0 +1,43 @@
+global:
+  resolve_timeout: 2m
+
+route:
+  receiver: default
+
+  routes:
+
+    # Critical alerts
+    - matchers:
+        - severity="critical"
+      receiver: critical
+
+    # Warning alerts
+    - matchers:
+        - severity="warning"
+      receiver: warning
+
+
+receivers:
+
+  - name: default
+    # Add your notification integration here
+
+  - name: critical
+    slack_configs:
+      - api_url: "Slack_token"
+        channel: "#critical"
+        title: ":rotating_light: {{ .CommonLabels.summary }}"
+        text: >-
+          {{ .CommonAnnotations.description }}
+          Impact: {{ .CommonAnnotations.impact }}
+        send_resolved: true
+
+  - name: warning
+    slack_configs:
+      - api_url: "Slack_token"
+        channel: "#warning"
+        title: ":warning: {{ .CommonLabels.summary }}"
+        text: >-
+          {{ .CommonAnnotations.description }}
+          Impact: {{ .CommonAnnotations.impact }}
+        send_resolved: true

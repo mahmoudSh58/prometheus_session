@@ -1,0 +1,113 @@
+groups:
+  - name: nvidia-gpu
+    interval: 30s
+
+    rules:
+
+      # DCGM exporter is down
+      - alert: NvidiaDCGMExporterDown
+        expr: up{job="nvidia-dcgm"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: gpu
+        annotations:
+          summary: ":rotating_light: NVIDIA DCGM exporter down on {{ $labels.instance }}"
+          description: |
+            The NVIDIA DCGM exporter on instance `{{ $labels.instance }}`
+            (job `{{ $labels.job }}`) has been unreachable for more than 2 minutes.
+            GPU metrics from this node are currently unavailable, which may mask
+            underlying GPU health or utilization issues.
+          impact: "GPU monitoring blind spot on {{ $labels.instance }} — no visibility into GPU health, temperature, or utilization."
+
+      # GPU utilization is very high
+      - alert: NvidiaGPUHighUtilization
+        expr: DCGM_FI_DEV_GPU_UTIL > 90
+        for: 1m
+        labels:
+          severity: warning
+          component: gpu
+        annotations:
+          summary: "High NVIDIA GPU utilization"
+          description: |
+            GPU {{ $labels.gpu }} on {{ $labels.instance }}
+            has utilization above 90%.
+            Current value: {{ $value }}%
+          impact: "Potential performance bottleneck on {{ $labels.instance }} — GPU may be overloaded or under-provisioned."
+
+      # GPU utilization is extremely high
+      - alert: NvidiaGPUCriticalUtilization
+        expr: DCGM_FI_DEV_GPU_UTIL > 98
+        for: 1m
+        labels:
+          severity: critical
+          component: gpu
+        annotations:
+          summary: "Critical NVIDIA GPU utilization"
+          description: |
+            GPU {{ $labels.gpu }} on {{ $labels.instance }}
+            has utilization above 98%.
+            Current value: {{ $value }}%
+          impact: "Severe performance bottleneck on {{ $labels.instance }} — GPU is likely overloaded or under-provisioned."
+
+      # GPU memory usage
+      - alert: NvidiaGPUMemoryHigh
+        expr: >
+          (
+            DCGM_FI_DEV_FB_USED
+            /
+            DCGM_FI_DEV_FB_FREE
+          ) > 4
+        for: 5m
+        labels:
+          severity: warning
+          component: gpu
+        annotations:
+          summary: "High NVIDIA GPU memory usage"
+          description: |
+            GPU {{ $labels.gpu }} on {{ $labels.instance }}
+            has memory usage above 80%.
+            Current value: {{ $value }}%
+          impact: "Potential performance bottleneck on {{ $labels.instance }} — GPU memory may be overloaded or under-provisioned."
+
+      # GPU temperature
+      - alert: NvidiaGPUHighTemperature
+        expr: DCGM_FI_DEV_GPU_TEMP > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: gpu
+        annotations:
+          summary: "High NVIDIA GPU temperature"
+          description: |
+            GPU {{ $labels.gpu }} temperature is above 80°C.
+            Current temperature: {{ $value }}°C
+          impact: "Potential performance bottleneck on {{ $labels.instance }} — GPU may be overheating."
+
+      # Critical temperature
+      - alert: NvidiaGPUCriticalTemperature
+        expr: DCGM_FI_DEV_GPU_TEMP > 90
+        for: 2m
+        labels:
+          severity: critical
+          component: gpu
+        annotations:
+          summary: "Critical NVIDIA GPU temperature"
+          description: |
+            GPU {{ $labels.gpu }} temperature is above 90°C.
+            Current temperature: {{ $value }}°C
+          impact: "Severe performance bottleneck on {{ $labels.instance }} — GPU may be overheating."
+
+      # GPU power consumption
+      - alert: NvidiaGPUHighPowerUsage
+        expr: DCGM_FI_DEV_POWER_USAGE > 90
+        for: 5m
+        labels:
+          severity: warning
+          component: gpu
+        annotations:
+          summary: "High NVIDIA GPU power usage"
+          description: |
+            GPU {{ $labels.gpu }} is consuming high power.
+            Current usage: {{ $value }} W
+          impact: "Potential performance bottleneck on {{ $labels.instance }} — GPU may be overloaded or under-provisioned."

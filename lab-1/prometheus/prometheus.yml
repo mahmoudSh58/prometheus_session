@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+scrape_configs:
+
+  # Prometheus itself
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090
+
+  # NVIDIA DCGM Exporter
+  - job_name: nvidia-dcgm
+    scheme: https
+    # authorization:
+    #   credentials: "your-token-here"
+    static_configs:
+      - targets:
+          - 9400-01m2rb3888894rfqht1b482weq.cloudspaces.litng.ai
