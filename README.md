@@ -1,6 +1,6 @@
 ## What you need to do
 - Install docker and docker-compose
-- clone this repository `git clone https://github.com/prometheus/prometheus.git`
+- clone this repository `git clone https://github.com/mahmoudSh58/prometheus_session.git`
 
 ## Lab 0: Prometheus on docker
 ```bash
